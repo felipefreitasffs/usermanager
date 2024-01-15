@@ -15,7 +15,7 @@ let failedRequestsQueue: FailedRequestQueue[] = [];
 let isRefreshing = false;
 
 const http = axios.create({
-  baseURL: "http://localhost:9080/apiuser",
+  baseURL: "http://host.docker.internal:9080/apiuser",
 });
 
 const refreshTokenAPI = function (refreshToken: string) {
@@ -72,10 +72,12 @@ const api = (): AxiosInstance => {
     (error: AxiosError) => {
       //Detecta se foi um erro de autorização
 
-      console.log("error.response", error.response)
+      console.log("error.response", JSON.stringify(error.response));
 
       if (error.response?.status === 401) {
         const refreshToken = Cookies.get("refresh_token");
+
+        console.log('refreshToken',refreshToken)
         //Uma sugestão aqui é verificar o tipo do erro retornando
         //pois um token pode ser inválido, por exemplo, e nesse caso
         //gerar um novo token usando o refreshtoken pode ser um
