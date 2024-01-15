@@ -19,10 +19,6 @@ export function Callback() {
     const state = searchParams.get("state") as string;
     const code = searchParams.get("code") as string;
 
-    console.log('accessToken', accessToken)
-    console.log('idToken', idToken)
-    console.log('code', code)
-
     if (!accessToken || !idToken || !state) {
       navigate("/login");
     }

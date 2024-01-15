@@ -3,6 +3,8 @@ import { JWTPayload, decodeJwt } from "jose";
 import Cookies from "js-cookie";
 import Login from '../utils/Login';
 
+let isMakingLogin = false;
+
 type AuthContextProps = {
   auth: JWTPayload | null;
   login: ((
@@ -72,12 +74,17 @@ export const AuthProvider = (props: PropsWithChildren) => {
         login: oldData.login,
       }));
 
-      exchangeCodeForToken(code).then((authData) => {
-        setData((oldData) => ({
-          auth: authData,
-          login: oldData.login,
-        }));
-      });
+      if (!isMakingLogin) {
+        exchangeCodeForToken(code).then((authData) => {
+          isMakingLogin = false;
+          setData((oldData) => ({
+            auth: authData,
+            login: oldData.login,
+          }));
+        });
+      }
+
+      isMakingLogin = true;
 
       return authData;
     },

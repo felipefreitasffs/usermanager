@@ -5,7 +5,7 @@ export function Home() {
   useEffect(() => {
     console.log("Home")
     async function name() {
-      const result = await api().get("/test")
+      const result = await api().get("/api/user ")
       console.log(result.data)
     }
 

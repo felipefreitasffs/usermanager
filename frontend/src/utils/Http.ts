@@ -15,7 +15,7 @@ let failedRequestsQueue: FailedRequestQueue[] = [];
 let isRefreshing = false;
 
 const http = axios.create({
-  baseURL: "http://host.docker.internal:9080/apiuser",
+  baseURL: "http://host.docker.internal:9080/",
 });
 
 const refreshTokenAPI = function (refreshToken: string) {
