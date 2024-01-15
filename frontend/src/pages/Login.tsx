@@ -22,7 +22,7 @@ export function Login() {
       state: state,
     });
 
-    return `http://localhost:8080/realms/usermanager/protocol/openid-connect/auth?${loginUrlParams.toString()}`;
+    return `http://host.docker.internal:8080/realms/usermanager/protocol/openid-connect/auth?${loginUrlParams.toString()}`;
   }
 
   useEffect(() => {

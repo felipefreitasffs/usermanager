@@ -3,8 +3,6 @@ import { JWTPayload, decodeJwt } from "jose";
 import Cookies from "js-cookie";
 import Login from '../utils/Login';
 
-let isMakingLogin = false;
-
 type AuthContextProps = {
   auth: JWTPayload | null;
   login: ((
@@ -25,7 +23,7 @@ const exchangeCodeForToken = function (code: string) {
   });
 
   return fetch(
-    "http://localhost:8080/realms/usermanager/protocol/openid-connect/token",
+    "http://host.docker.internal:8080/realms/usermanager/protocol/openid-connect/token",
     {
       method: "POST",
       headers: {
@@ -74,17 +72,12 @@ export const AuthProvider = (props: PropsWithChildren) => {
         login: oldData.login,
       }));
 
-      if (!isMakingLogin) {
-        exchangeCodeForToken(code).then((authData) => {
-          isMakingLogin = false;
-          setData((oldData) => ({
-            auth: authData,
-            login: oldData.login,
-          }));
-        });
-      }
-
-      isMakingLogin = true;
+      exchangeCodeForToken(code).then((authData) => {
+        setData((oldData) => ({
+          auth: authData,
+          login: oldData.login,
+        }));
+      });
 
       return authData;
     },

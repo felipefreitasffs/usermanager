@@ -21,6 +21,7 @@ export function Callback() {
 
     console.log('accessToken', accessToken)
     console.log('idToken', idToken)
+    console.log('code', code)
 
     if (!accessToken || !idToken || !state) {
       navigate("/login");

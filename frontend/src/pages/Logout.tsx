@@ -20,7 +20,7 @@ export function Logout() {
     Cookies.remove("nonce");
     Cookies.remove("state");
 
-    return `http://localhost:8080/realms/usermanager/protocol/openid-connect/logout?${logoutParams.toString()}`;
+    return `http://host.docker.internal:8080/realms/usermanager/protocol/openid-connect/logout?${logoutParams.toString()}`;
   }
 
 
