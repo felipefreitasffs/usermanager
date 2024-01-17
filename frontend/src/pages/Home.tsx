@@ -10,12 +10,6 @@ export function Home() {
       setApiResult(result.data)
       return
     })
-    api.get("/api/user")
-    api.get("/api/user")
-    api.get("/api/user")
-    api.get("/api/user")
-    api.get("/api/user")
-    api.get("/api/user")
   }, [])
 
   return <div>{apiResult}...</div>

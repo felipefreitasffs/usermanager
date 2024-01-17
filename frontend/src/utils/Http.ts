@@ -48,11 +48,19 @@ http.interceptors.request.use((request) => {
   const access_token_exp = Cookies.get("access_token_exp");
 
   if (!access_token) {
-    throw new Error("Access Token not found");
+    console.error("Access Token not found");
+    // Limpar os tokens e mando o usuário para o login
+    clearCookies();
+    window.location.href = "/login";
+    return request;
   }
 
   if (!access_token_exp) {
-    throw new Error("Expiration Date of the Access Token not found");
+    console.error("Expiration Date of the Access Token not found");
+    // Limpar os tokens e mando o usuário para o login
+    clearCookies();
+    window.location.href = "/login";
+    return request;
   }
 
   // Calcula a diferença de tempo da data de expiração com a atual
@@ -68,7 +76,11 @@ http.interceptors.request.use((request) => {
     const refreshToken = Cookies.get("refresh_token");
 
     if (!refreshToken) {
-      throw new Error("Refresh Token not found");
+      console.error("Refresh Token not found");
+      // Limpar os tokens e mando o usuário para o login
+      clearCookies();
+      window.location.href = "/login";
+      return request;
     }
 
     //Verifica se não está acontecendo um processo de refresh
