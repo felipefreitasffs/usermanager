@@ -15,14 +15,14 @@ export function Login() {
     Cookies.set("state", state);
 
     const loginUrlParams = new URLSearchParams({
-      client_id: "react-front",
-      redirect_uri: "http://127.0.0.1:5173/callback",
+      client_id: import.meta.env.VITE_KC_CLIENT_ID,
+      redirect_uri: `${import.meta.env.VITE_BASE_URL}/callback`,
       response_type: "token id_token code",
       nonce: nonce,
       state: state,
     });
 
-    return `http://host.docker.internal:8080/realms/usermanager/protocol/openid-connect/auth?${loginUrlParams.toString()}`;
+    return `${import.meta.env.VITE_KC_BASE_URL}/auth?${loginUrlParams.toString()}`;
   }
 
   useEffect(() => {

@@ -1,20 +1,21 @@
-import { decodeJwt } from "jose";
+import { JWTPayload, decodeJwt } from "jose";
 import Cookies from "js-cookie";
 
-const login = function (
+export const decodeJWTAndSetCookie = function (
   accessToken: string,
   idToken: string | null,
   refreshToken?: string | null,
   state?: string
-) {
+): JWTPayload {
   const stateCookie = Cookies.get("state");
   if (state && stateCookie !== state) {
     throw new Error("Invalid state");
   }
 
-  let decodedAccessToken = null;
-  let decodedIdToken = null;
-  let decodedRefreshToken = null;
+  let decodedAccessToken: JWTPayload | null = null;
+  let decodedIdToken: JWTPayload | null = null;
+  let decodedRefreshToken: JWTPayload | null = null;
+
   try {
     decodedAccessToken = decodeJwt(accessToken);
 
@@ -45,15 +46,26 @@ const login = function (
     throw new Error("Invalid nonce");
   }
 
-  Cookies.set("access_token", accessToken);
+  if (decodedAccessToken && decodedAccessToken.exp) {
+    Cookies.set("access_token", accessToken);
+    Cookies.set("access_token_exp", decodedAccessToken.exp.toString());
+  }
+
   if (idToken) {
     Cookies.set("id_token", idToken);
   }
+
   if (decodedRefreshToken) {
     Cookies.set("refresh_token", refreshToken as string);
   }
 
   return decodedAccessToken;
-}
+};
 
-export default login;
+export const clearCookies = function () {
+  Cookies.remove("access_token");
+  Cookies.remove("id_token");
+  Cookies.remove("refresh_token");
+  Cookies.remove("nonce");
+  Cookies.remove("state");
+};

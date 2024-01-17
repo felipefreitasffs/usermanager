@@ -1,7 +1,7 @@
 import { PropsWithChildren, createContext, useCallback, useState } from "react";
 import { JWTPayload, decodeJwt } from "jose";
 import Cookies from "js-cookie";
-import Login from '../utils/Login';
+import { decodeJWTAndSetCookie } from '../utils/Auth';
 
 let isMakingLogin = false;
 
@@ -17,15 +17,15 @@ type AuthContextProps = {
 
 const exchangeCodeForToken = function (code: string) {
   const tokenUrlParams = new URLSearchParams({
-    client_id: "react-front",
+    client_id: import.meta.env.VITE_KC_CLIENT_ID,
     grant_type: "authorization_code",
     code: code,
-    redirect_uri: "http://127.0.0.1:5173/callback",
+    redirect_uri: `${import.meta.env.VITE_BASE_URL}/callback`,
     nonce: Cookies.get("nonce") as string,
   });
 
   return fetch(
-    "http://host.docker.internal:8080/realms/usermanager/protocol/openid-connect/token",
+    `${import.meta.env.VITE_KC_BASE_URL}/token`,
     {
       method: "POST",
       headers: {
@@ -36,8 +36,11 @@ const exchangeCodeForToken = function (code: string) {
   )
     .then((res) => res.json())
     .then((res) => {
-      return Login(res.access_token, null, res.refresh_token);
-    }).catch((err) => { console.log(err) });
+      return decodeJWTAndSetCookie(res.access_token, null, res.refresh_token);
+    }).catch((err) => { 
+      console.log(err) 
+      return null;
+    });
 }
 
 const getAuth = function () {
@@ -67,7 +70,7 @@ export const AuthContext = createContext(initContextData);
 export const AuthProvider = (props: PropsWithChildren) => {
   const makeLogin = useCallback(
     (accessToken: string, idToken: string, code: string, state: string) => {
-      const authData = Login(accessToken, idToken, null, state);
+      const authData = decodeJWTAndSetCookie(accessToken, idToken, null, state);
 
       setData((oldData) => ({
         auth: authData,

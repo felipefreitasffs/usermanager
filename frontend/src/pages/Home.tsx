@@ -1,16 +1,22 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import api from "../utils/Http";
 
 export function Home() {
+  const [apiResult, setApiResult] = useState('Olá')
+
   useEffect(() => {
-    console.log("Home")
-    async function name() {
-      const result = await api().get("/api/user ")
-      console.log(result.data)
-    }
+    api.get("/api/user").then((result) => {
+      console.log('result', result)
+      setApiResult(result.data)
+      return
+    })
+    api.get("/api/user")
+    api.get("/api/user")
+    api.get("/api/user")
+    api.get("/api/user")
+    api.get("/api/user")
+    api.get("/api/user")
+  }, [])
 
-    name();
-  })
-
-  return <div>Olá...</div>
+  return <div>{apiResult}...</div>
 }

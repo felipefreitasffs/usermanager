@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import Cookies from "js-cookie";
+import { clearCookies } from "../utils/Auth";
 
 export function Logout() {
 
@@ -9,18 +10,14 @@ export function Logout() {
     }
 
     const logoutParams = new URLSearchParams({
-      //client_id: "fullcycle-client",
+      client_id: import.meta.env.VITE_KC_CLIENT_ID,
       id_token_hint: Cookies.get("id_token") as string,
-      post_logout_redirect_uri: "http://localhost:3000/login",
+      post_logout_redirect_uri: `${import.meta.env.BASE_URL}/login`,
     });
 
-    Cookies.remove("access_token");
-    Cookies.remove("id_token");
-    Cookies.remove("refresh_token");
-    Cookies.remove("nonce");
-    Cookies.remove("state");
+    clearCookies();
 
-    return `http://host.docker.internal:8080/realms/usermanager/protocol/openid-connect/logout?${logoutParams.toString()}`;
+    return `${import.meta.env.VITE_KC_BASE_URL}/logout?${logoutParams.toString()}`;
   }
 
 
