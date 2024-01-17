@@ -38,7 +38,7 @@ const exchangeCodeForToken = function (code: string) {
     .then((res) => {
       return decodeJWTAndSetCookie(res.access_token, null, res.refresh_token);
     }).catch((err) => { 
-      console.log(err) 
+      console.error(err) 
       return null;
     });
 }
