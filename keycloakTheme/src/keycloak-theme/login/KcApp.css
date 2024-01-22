@@ -1,0 +1,15 @@
+.my-color {
+  color: white;
+}
+
+.my-font {
+  font-family: "Work Sans";
+}
+
+.my-root-class {
+  background: #001b39;
+}
+
+.my-root-class body {
+  background: #001b39;
+}

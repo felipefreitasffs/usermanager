@@ -7,7 +7,10 @@ services:
 # -------------
 
   keycloak:
-    image: quay.io/keycloak/keycloak:23.0
+    # image: quay.io/keycloak/keycloak:23.0
+    build: 
+      context: ../
+      dockerfile: ./Services/keycloak/Dockerfile
     command: start-dev
     ports:
       - 8080:8080

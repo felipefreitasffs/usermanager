@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import api from "../utils/Http";
+import { AuthContext } from "../Context/AuthProvider";
 
 export function Home() {
+  const { auth } = useContext(AuthContext);
   const [apiResult, setApiResult] = useState('Olá')
 
   useEffect(() => {
@@ -12,5 +14,10 @@ export function Home() {
     })
   }, [])
 
-  return <div>{apiResult}...</div>
+  return(
+    <>
+      <p>Olá {auth ? auth.name as string : ''}</p>
+      <p>{apiResult}...</p>
+    </>
+  ) 
 }
