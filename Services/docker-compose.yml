@@ -11,9 +11,12 @@ services:
     build: 
       context: ../
       dockerfile: ./Services/keycloak/Dockerfile
-    command: start-dev
+    # command: start-dev
     ports:
       - 8080:8080
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import
+    command: start-dev --import-realm
     environment:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
