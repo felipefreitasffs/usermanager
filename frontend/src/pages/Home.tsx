@@ -7,8 +7,7 @@ export function Home() {
   const [apiResult, setApiResult] = useState('Olá')
 
   useEffect(() => {
-    api.get("/api/user").then((result) => {
-      console.log('result', result)
+    api.get("/api/user/users").then((result) => {
       setApiResult(result.data)
       return
     })
