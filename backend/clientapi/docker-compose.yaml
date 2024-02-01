@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+
+  clientapi:
+    build: .
+    ports:
+      - 3002:3000
+      - 9229:9229
+    volumes:
+      - .:/home/node/app

@@ -1,22 +1,11 @@
-import { useContext, useEffect, useState } from "react";
-import api from "../utils/Http";
-import { AuthContext } from "../Context/AuthProvider";
+import { Typography } from "@material-tailwind/react";
 
 export function Home() {
-  const { auth } = useContext(AuthContext);
-  const [apiResult, setApiResult] = useState('Olá')
-
-  useEffect(() => {
-    api.get("/api/user/users").then((result) => {
-      setApiResult(result.data)
-      return
-    })
-  }, [])
-
-  return(
-    <>
-      <p>Olá {auth ? auth.name as string : ''}</p>
-      <p>{apiResult}...</p>
-    </>
-  ) 
+  return (
+    <div className="mx-auto h-[calc(100vh-5rem)] w-full px-5 py-5 flex justify-center items-center">
+      <Typography variant="h1" color="blue-gray" textGradient placeholder={undefined}>
+        Bem vindo
+      </Typography>
+    </div>
+  )
 }
