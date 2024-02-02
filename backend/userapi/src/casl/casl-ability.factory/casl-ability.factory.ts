@@ -28,7 +28,7 @@ export class CaslAbilityFactory {
     );
 
     const groups = user.Group as Array<string>;
-    const userPermission = (user.userPerm as string).split('|');
+    const userPermission = (user.userPerm as string)?.split('|');
 
     if (groups.includes('AdminMaster')) {
       can(Action.Manage, 'all'); // read-write access to everything

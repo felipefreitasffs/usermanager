@@ -31,8 +31,8 @@ export class UnitsController {
   @CheckPolicies((ability: PureAbility) => ability.can(Action.Read, 'Unit'))
   findAll(@Query('skip') skip?: string, @Query('take') take?: string) {
     return this.unitsService.findAll({
-      skip: +skip,
-      take: +take,
+      skip: +skip || undefined,
+      take: +take || undefined,
     });
   }
 

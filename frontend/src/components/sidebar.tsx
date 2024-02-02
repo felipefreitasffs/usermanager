@@ -96,12 +96,14 @@ export function SidebarWithBurgerMenu() {
 
             <hr className="my-2 border-blue-gray-50" />
 
-            <ListItem placeholder={undefined}>
-              <ListItemPrefix placeholder={undefined}>
-                <UsersIcon className="h-5 w-5" />
-              </ListItemPrefix>
-              Clientes
-            </ListItem>
+            <a href="/clients" className="text-initial">
+              <ListItem selected={location === '/clients'} placeholder={undefined}>
+                <ListItemPrefix placeholder={undefined}>
+                  <UsersIcon className="h-5 w-5" />
+                </ListItemPrefix>
+                Clientes
+              </ListItem>
+            </a>
             <ListItem placeholder={undefined}>
               <ListItemPrefix placeholder={undefined}>
                 <BuildingOfficeIcon className="h-5 w-5" />

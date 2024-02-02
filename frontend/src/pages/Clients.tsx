@@ -4,7 +4,7 @@ import { AuthContext } from "../Context/AuthProvider";
 import { UserPlusIcon, MagnifyingGlassIcon, ChevronUpDownIcon, PencilIcon } from "@heroicons/react/24/solid";
 import { Card, CardHeader, Typography, Button, Input, CardBody, Avatar, Chip, Tooltip, IconButton, CardFooter } from "@material-tailwind/react";
 
-export function Users() {
+export function Clients() {
   const { auth } = useContext(AuthContext);
   const [apiResult, setApiResult] = useState('Olá')
 

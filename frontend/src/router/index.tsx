@@ -5,6 +5,7 @@ import { Home } from "../pages/Home";
 import { PrivateRoute } from "./PrivateRoute";
 import { Callback } from "../pages/Callback";
 import { Users } from "../pages/Users";
+import { Clients } from "../pages/Clients";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
       {
         path: "/users",
         element: <Users />
+      },
+      {
+        path: "/clients",
+        element: <Clients />
       }
     ]
   }

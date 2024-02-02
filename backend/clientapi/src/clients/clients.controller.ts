@@ -31,8 +31,8 @@ export class ClientsController {
   @CheckPolicies((ability: PureAbility) => ability.can(Action.Read, 'Client'))
   findAll(@Query('skip') skip?: string, @Query('take') take?: string) {
     return this.clientsService.findAll({
-      skip: +skip,
-      take: +take,
+      skip: +skip || undefined,
+      take: +take || undefined,
     });
   }
 

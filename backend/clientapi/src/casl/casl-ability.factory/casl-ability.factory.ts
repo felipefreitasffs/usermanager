@@ -34,8 +34,8 @@ export class CaslAbilityFactory {
       can(Action.Manage, 'Client'); // read-write access to everything
       can(Action.Manage, 'Unit'); // read-write access to everything
     } else {
-      const clientPermissions = (user.clientPerm as string).split('|');
-      const unitPermissions = (user.unitPerm as string).split('|');
+      const clientPermissions = (user.clientPerm as string)?.split('|');
+      const unitPermissions = (user.unitPerm as string)?.split('|');
 
       if (clientPermissions) {
         clientPermissions.forEach((perm) => {
