@@ -1,14 +1,12 @@
 import {
   AbilityBuilder,
-  AbilityClass,
   ExtractSubjectType,
   InferSubjects,
-  MongoAbility,
   PureAbility,
 } from '@casl/ability';
 import { Injectable } from '@nestjs/common';
 import { JWTPayload } from 'jose';
-import { User } from 'src/users/entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 
 export enum Action {
   Manage = 'manage',
@@ -20,13 +18,13 @@ export enum Action {
 
 type Subjects = InferSubjects<typeof User> | 'all';
 
-export type AppAbility = MongoAbility<[Action, Subjects]>;
+export type AppAbility = PureAbility<[Action, Subjects]>;
 
 @Injectable()
 export class CaslAbilityFactory {
   createForUser(user: JWTPayload) {
-    const { can, build } = new AbilityBuilder<MongoAbility<[Action, Subjects]>>(
-      PureAbility as AbilityClass<AppAbility>,
+    const { can, build } = new AbilityBuilder<PureAbility<[Action, Subjects]>>(
+      PureAbility,
     );
 
     const groups = user.Group as Array<string>;
