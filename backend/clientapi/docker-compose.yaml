@@ -5,7 +5,33 @@ services:
   clientapi:
     build: .
     ports:
-      - 3002:3000
+      - 3003:3000
       - 9229:9229
     volumes:
       - .:/home/node/app
+    depends_on:
+      clientdb:
+        condition: service_healthy
+    networks:
+      services_myservices:
+
+  clientdb:
+    image: mysql:8.0.35-debian
+    volumes:
+      - ./.docker/dbdata:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=clientapi
+    security_opt:
+      - seccomp:unconfined
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+    networks:
+      services_myservices:
+
+networks:
+  services_myservices:
+    external: true
