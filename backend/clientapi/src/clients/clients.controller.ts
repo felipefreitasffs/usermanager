@@ -7,15 +7,14 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { PureAbility } from '@casl/ability';
 import { ClientsService } from './clients.service';
-import { CreateClientDto } from './dto/create-client.dto';
-import { UpdateClientDto } from './dto/update-client.dto';
 import { PoliciesGuard } from '../policy/policy.guard';
-import { Client } from './entities/client.entity';
 import { Action } from '../casl/casl-ability.factory/casl-ability.factory';
 import { CheckPolicies } from '../policy/policy.decorator';
+import { Prisma } from '@prisma/client';
 
 @Controller('clients')
 @UseGuards(PoliciesGuard)
@@ -23,32 +22,41 @@ export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 
   @Post()
-  @CheckPolicies((ability: PureAbility) => ability.can(Action.Create, Client))
-  create(@Body() createClientDto: CreateClientDto) {
+  @CheckPolicies((ability: PureAbility) => ability.can(Action.Create, 'Client'))
+  create(@Body() createClientDto: Prisma.ClientCreateInput) {
     return this.clientsService.create(createClientDto);
   }
 
   @Get()
-  @CheckPolicies((ability: PureAbility) => ability.can(Action.Read, Client))
-  findAll() {
-    return this.clientsService.findAll();
+  @CheckPolicies((ability: PureAbility) => ability.can(Action.Read, 'Client'))
+  findAll(@Query('skip') skip?: string, @Query('take') take?: string) {
+    return this.clientsService.findAll({
+      skip: +skip,
+      take: +take,
+    });
   }
 
   @Get(':id')
-  @CheckPolicies((ability: PureAbility) => ability.can(Action.Read, Client))
+  @CheckPolicies((ability: PureAbility) => ability.can(Action.Read, 'Client'))
   findOne(@Param('id') id: string) {
-    return this.clientsService.findOne(+id);
+    return this.clientsService.findOne({ id: +id });
   }
 
   @Patch(':id')
-  @CheckPolicies((ability: PureAbility) => ability.can(Action.Update, Client))
-  update(@Param('id') id: string, @Body() updateClientDto: UpdateClientDto) {
-    return this.clientsService.update(+id, updateClientDto);
+  @CheckPolicies((ability: PureAbility) => ability.can(Action.Update, 'Client'))
+  update(
+    @Param('id') id: string,
+    @Body() updateClientDto: Prisma.ClientUpdateInput,
+  ) {
+    return this.clientsService.update({
+      where: { id: +id },
+      data: updateClientDto,
+    });
   }
 
   @Delete(':id')
-  @CheckPolicies((ability: PureAbility) => ability.can(Action.Delete, Client))
+  @CheckPolicies((ability: PureAbility) => ability.can(Action.Delete, 'Client'))
   remove(@Param('id') id: string) {
-    return this.clientsService.remove(+id);
+    return this.clientsService.remove({ id: +id });
   }
 }

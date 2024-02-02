@@ -1,15 +1,8 @@
-import {
-  AbilityBuilder,
-  AbilityClass,
-  ExtractSubjectType,
-  InferSubjects,
-  MongoAbility,
-  PureAbility,
-} from '@casl/ability';
+import { AbilityBuilder, ExtractSubjectType, PureAbility } from '@casl/ability';
+import { PrismaQuery, Subjects, createPrismaAbility } from '@casl/prisma';
 import { Injectable } from '@nestjs/common';
+import { Client, Unit } from '@prisma/client';
 import { JWTPayload } from 'jose';
-import { Client } from 'src/clients/entities/client.entity';
-import { Unit } from 'src/units/entities/unit.entity';
 
 export enum Action {
   Manage = 'manage',
@@ -19,34 +12,40 @@ export enum Action {
   Delete = 'delete',
 }
 
-type Subjects = InferSubjects<typeof Client | typeof Unit> | 'all';
-
-export type AppAbility = MongoAbility<[Action, Subjects]>;
+export type AppAbility = PureAbility<
+  [
+    string,
+    Subjects<{
+      Client: Client;
+      Unit: Unit;
+    }>,
+  ],
+  PrismaQuery
+>;
 
 @Injectable()
 export class CaslAbilityFactory {
   createForUser(user: JWTPayload) {
-    const { can, build } = new AbilityBuilder<MongoAbility<[Action, Subjects]>>(
-      PureAbility as AbilityClass<AppAbility>,
-    );
+    const { can, build } = new AbilityBuilder<AppAbility>(createPrismaAbility);
 
     const groups = user.Group as Array<string>;
 
     if (groups.includes('AdminMaster')) {
-      can(Action.Manage, 'all'); // read-write access to everything
+      can(Action.Manage, 'Client'); // read-write access to everything
+      can(Action.Manage, 'Unit'); // read-write access to everything
     } else {
-      const clientPermission = (user.clientPerm as string).split('|');
-      const unitPermission = (user.unitPerm as string).split('|');
+      const clientPermissions = (user.clientPerm as string).split('|');
+      const unitPermissions = (user.unitPerm as string).split('|');
 
-      if (clientPermission) {
-        clientPermission.forEach((perm) => {
-          can(Action[perm], Client); // set permission to manage client
+      if (clientPermissions) {
+        clientPermissions.forEach((perm) => {
+          can(Action[perm], 'Client'); // set permission to manage client
         });
       }
 
-      if (unitPermission) {
-        unitPermission.forEach((perm) => {
-          can(Action[perm], Unit); // set permission to manage unit
+      if (unitPermissions) {
+        unitPermissions.forEach((perm) => {
+          can(Action[perm], 'Unit'); // set permission to manage unit
         });
       }
     }
@@ -54,7 +53,10 @@ export class CaslAbilityFactory {
     return build({
       // Read https://casl.js.org/v6/en/guide/subject-type-detection#use-classes-as-subject-types for details
       detectSubjectType: (item) =>
-        item.constructor as ExtractSubjectType<Subjects>,
+        item.constructor as ExtractSubjectType<{
+          Client: Client;
+          Unit: Unit;
+        }>,
     });
   }
 }

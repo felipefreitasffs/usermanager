@@ -1,26 +1,56 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUnitDto } from './dto/create-unit.dto';
-import { UpdateUnitDto } from './dto/update-unit.dto';
+import { PrismaService } from '../prisma/prisma.service';
+import { Prisma, Unit } from '@prisma/client';
 
 @Injectable()
 export class UnitsService {
-  create(createUnitDto: CreateUnitDto) {
-    return 'This action adds a new unit';
+  constructor(private prisma: PrismaService) {}
+
+  create(data: Prisma.UnitCreateInput): Promise<Unit> {
+    return this.prisma.unit.create({
+      data,
+    });
   }
 
-  findAll() {
-    return `This action returns all units`;
+  findAll(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.UnitWhereUniqueInput;
+    where?: Prisma.UnitWhereInput;
+    orderBy?: Prisma.UnitOrderByWithRelationInput;
+  }): Promise<Unit[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.unit.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      orderBy,
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} unit`;
+  findOne(
+    UnitWhereUniqueInput: Prisma.UnitWhereUniqueInput,
+  ): Promise<Unit | null> {
+    return this.prisma.unit.findUnique({
+      where: UnitWhereUniqueInput,
+    });
   }
 
-  update(id: number, updateUnitDto: UpdateUnitDto) {
-    return `This action updates a #${id} unit`;
+  update(params: {
+    where: Prisma.UnitWhereUniqueInput;
+    data: Prisma.UnitUpdateInput;
+  }): Promise<Unit> {
+    const { where, data } = params;
+    return this.prisma.unit.update({
+      data,
+      where,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} unit`;
+  remove(where: Prisma.UnitWhereUniqueInput): Promise<Unit> {
+    return this.prisma.unit.delete({
+      where,
+    });
   }
 }
