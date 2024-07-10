@@ -26,6 +26,9 @@ export class UnitsService {
       cursor,
       where,
       orderBy,
+      include: {
+        client: true,
+      },
     });
   }
 
@@ -34,6 +37,9 @@ export class UnitsService {
   ): Promise<Unit | null> {
     return this.prisma.unit.findUnique({
       where: UnitWhereUniqueInput,
+      include: {
+        client: true,
+      },
     });
   }
 

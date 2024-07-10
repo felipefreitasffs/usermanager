@@ -87,12 +87,14 @@ export function SidebarWithBurgerMenu() {
                 Usuários
               </ListItem>
             </a>
-            <ListItem placeholder={undefined}>
-              <ListItemPrefix placeholder={undefined}>
-                <UserGroupIcon className="h-5 w-5" />
-              </ListItemPrefix>
-              Grupos
-            </ListItem>
+            <a href="/groups" className="text-initial">
+              <ListItem placeholder={undefined}>
+                <ListItemPrefix placeholder={undefined}>
+                  <UserGroupIcon className="h-5 w-5" />
+                </ListItemPrefix>
+                Grupos
+              </ListItem>
+            </a>
 
             <hr className="my-2 border-blue-gray-50" />
 
@@ -104,20 +106,25 @@ export function SidebarWithBurgerMenu() {
                 Clientes
               </ListItem>
             </a>
-            <ListItem placeholder={undefined}>
-              <ListItemPrefix placeholder={undefined}>
-                <BuildingOfficeIcon className="h-5 w-5" />
-              </ListItemPrefix>
-              Unidades
-            </ListItem>
+            <a href="/units" className="text-initial">
+              <ListItem selected={location === '/units'} placeholder={undefined}>
+                <ListItemPrefix placeholder={undefined}>
+                  <BuildingOfficeIcon className="h-5 w-5" />
+                </ListItemPrefix>
+                Unidades
+              </ListItem>
+            </a>
 
             <hr className="my-2 border-blue-gray-50" />
-            <ListItem placeholder={undefined}>
-              <ListItemPrefix placeholder={undefined}>
-                <PowerIcon className="h-5 w-5" />
-              </ListItemPrefix>
-              Log Out
-            </ListItem>
+
+            <a href="/logout" className="text-initial">
+              <ListItem placeholder={undefined}>
+                <ListItemPrefix placeholder={undefined}>
+                  <PowerIcon className="h-5 w-5" />
+                </ListItemPrefix>
+                Log Out
+              </ListItem>
+            </a>
           </List>
         </Card>
       </Drawer>

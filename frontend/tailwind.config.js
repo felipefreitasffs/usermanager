@@ -10,6 +10,8 @@ export default withMT({
       },
     },
   },
-  colors: {},
+  colors: {
+    myBlue: "#001b39",
+  },
   plugins: [],
 });

@@ -13,6 +13,16 @@ export class UsersService {
     try {
       const kc = await kcAdminClient();
       const users = await kc.users.find({ first: 0, max: 10 });
+
+      const scope = await kc.clientScopes.findOneByName({
+        name: 'Permissions',
+      });
+
+      const listScopeMappings = await kc.clientScopes.listProtocolMappers({
+        id: scope.id,
+      });
+      console.log('listScopeMappings', listScopeMappings);
+
       return users;
     } catch (error) {
       console.error(error);

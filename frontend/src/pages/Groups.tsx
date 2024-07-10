@@ -1,49 +1,72 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { UserPlusIcon, MagnifyingGlassIcon, ChevronUpDownIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/solid";
-import { Card, CardHeader, Typography, Button, Input, CardBody, Tooltip, IconButton, CardFooter, Dialog, Alert } from "@material-tailwind/react";
+import { Card, CardHeader, Typography, Button, Input, CardBody, Tooltip, IconButton, CardFooter, Dialog, Alert, Checkbox } from "@material-tailwind/react";
 import api from "../utils/Http";
 
-export function Clients() {
-  const [openClientDialog, setOpenClientDialog] = useState(false);
+type groups = {
+  name: string;
+  attributes: unknown[]
+}
+
+export function Groups() {
+  const [openGroupDialog, setOpenGroupDialog] = useState(false);
   const [sendingFormLoading, setSendingFormLoading] = useState(false);
-  const [clientName, setClientName] = useState('');
-  const [clientCNPJ, setClientCNPJ] = useState('');
-  const [clientEmail, setClientEmail] = useState('');
-  const [clientPhone, setClientPhone] = useState('');
-  const [tableRows, setTableRows] = useState([]);
+  const [groupName, setGroupName] = useState('');
+  const [tableRows, setTableRows] = useState<groups[]>([]);
   const [alertSuccess, setAlertSuccess] = useState(false);
+  const [permissions, setPermissions] = useState([]);
+  const [groupAttr, setGroupAttr] = useState<Record<string, string | undefined>>({});
 
   useEffect(() => {
-    loadClients(0, 10);
+    loadGroups(0, 10);
+    loadPermissions();
   }, []);
 
-  const tableHead = ["Nome", "Email", "Telefone", "CNPJ", ""];
+  const tableHead = ["Nome", "Permissões", ""];
 
-  const loadClients = function (skip: number, take: number) {
+  const loadGroups = function (skip: number, take: number) {
     const pagination = new URLSearchParams({
       skip: skip.toString(),
       take: take.toString(),
     });
 
-    api.get(`/api/clients?${pagination.toString()}`).then((result) => {
+    api.get(`/api/groups?${pagination.toString()}`).then((result) => {
       setTableRows(result.data)
       return
     })
   };
 
-  const handleOpenClientDialog = () => setOpenClientDialog((cur) => !cur);
+  const loadPermissions = function () {
+    api.get(`/api/groups/permissions`).then((result) => {
+      const gpAttr: Record<string, string | undefined> = {}
 
-  const handleSendClientForm = async function () {
+      console.log('result.data', result.data)
+
+      result.data.map((perm: { config: { [x: string]: string | string; }; }) => {
+        gpAttr[perm.config["user.attribute"]] = undefined
+      })
+
+      console.log('gpAttr', gpAttr)
+
+      setGroupAttr(gpAttr)
+
+      setPermissions(result.data)
+      return
+    })
+  };
+
+  const handleOpenGroupDialog = () => setOpenGroupDialog((cur) => !cur);
+
+  const handleSendGroupForm = async function () {
     setSendingFormLoading(true);
 
     try {
-      await api.post("/api/clients", {
-        name: clientName,
-        email: clientEmail,
-        cnpj: clientCNPJ,
-        phone: clientPhone
+      await api.post("/api/groups", {
+        name: groupName,
+        attributes: groupAttr
       })
-      handleOpenClientDialog()
+
+      handleOpenGroupDialog()
       setSendingFormLoading(false);
 
       setAlertSuccess(true)
@@ -51,31 +74,50 @@ export function Clients() {
         setAlertSuccess(false)
       }, 5000);
 
-      loadClients(0, 10);
-      setClientName('');
-      setClientCNPJ('');
-      setClientEmail('');
-      setClientPhone('');
+      loadGroups(0, 10);
+      setGroupName('');
     } catch (error) {
+      setSendingFormLoading(false);
       console.error(error)
     }
   };
 
-  const handleClientNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setClientName(event.target.value);
+  const handleGroupNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setGroupName(event.target.value);
   };
 
-  const handleClientCNPJChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setClientCNPJ(event.target.value);
-  };
+  const handleCheckPermissionChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const checkType = event.target.name.split('#')[0];
+    const permissionId = event.target.name.split('#')[1];
 
-  const handleClientEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setClientEmail(event.target.value);
-  };
+    const permissionName = permissions.find(p => p.id === permissionId)?.name;
 
-  const handleClientPhoneChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setClientPhone(event.target.value);
-  };
+    console.log(event.target.checked)
+
+    if (event.target.checked) {
+      const listPerms = groupAttr[permissionName] ? groupAttr[permissionName].split('|') : [""]
+
+      if (listPerms.indexOf('') >= 0)
+        listPerms.splice(listPerms.indexOf(''), 1)
+
+      listPerms.push(checkType)
+
+      groupAttr[permissionName] = listPerms.join('|')
+    } else {
+      const listPerms = groupAttr[permissionName] ? groupAttr[permissionName].split('|') : [""]
+
+      if (listPerms.indexOf('') >= 0)
+        listPerms.splice(listPerms.indexOf(''), 1)
+
+      listPerms.splice(listPerms.indexOf(checkType), 1)
+      groupAttr[permissionName] = listPerms.join('|')
+    }
+
+    console.log(groupAttr)
+
+    setGroupAttr(groupAttr);
+
+  }
 
   return (
     <>
@@ -84,10 +126,10 @@ export function Clients() {
           <div className="mb-8 flex items-center justify-between gap-8">
             <div>
               <Typography variant="h5" color="blue-gray" placeholder={undefined}>
-                Clientes
+                Grupos
               </Typography>
               <Typography color="gray" className="mt-1 font-normal" placeholder={undefined}>
-                Lista dos clientes do sistema
+                Lista de Grupos de Usuários
               </Typography>
             </div>
             <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
@@ -96,8 +138,8 @@ export function Clients() {
                   label="Pesquisar"
                   icon={<MagnifyingGlassIcon className="h-5 w-5" />} crossOrigin={undefined} />
               </div>
-              <Button className="flex items-center gap-3" size="sm" placeholder={undefined} onClick={handleOpenClientDialog}>
-                <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Novo Cliente
+              <Button className="flex items-center gap-3" size="sm" placeholder={undefined} onClick={handleOpenGroupDialog}>
+                <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Novo Grupo
               </Button>
             </div>
           </div>
@@ -126,7 +168,7 @@ export function Clients() {
             </thead>
             <tbody>
               {tableRows.map(
-                ({ name, email, cnpj, phone }, index) => {
+                ({ name, attributes }, index) => {
                   const isLast = index === tableRows.length - 1;
                   const classes = isLast
                     ? "p-4"
@@ -142,30 +184,16 @@ export function Clients() {
                           {name}
                         </Typography>
                       </td>
+
                       <td className={classes}>
                         <Typography
                           variant="small"
                           color="blue-gray"
                           className="font-normal" placeholder={undefined}>
-                          {email}
+                          {Object.keys(attributes).map((key) => <p key={key}>{key}: {attributes[key]}</p>)}
                         </Typography>
                       </td>
-                      <td className={classes}>
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal" placeholder={undefined}>
-                          {cnpj}
-                        </Typography>
-                      </td>
-                      <td className={classes}>
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal" placeholder={undefined}>
-                          {phone}
-                        </Typography>
-                      </td>
+
                       <td className={classes}>
                         <Tooltip content="Editar Client">
                           <IconButton variant="text" placeholder={undefined}>
@@ -202,43 +230,59 @@ export function Clients() {
 
       <Dialog
         size="md"
-        open={openClientDialog}
-        handler={handleOpenClientDialog}
+        open={openGroupDialog}
+        handler={handleOpenGroupDialog}
         className="bg-transparent shadow-none" placeholder={undefined}>
         <Card className="mx-auto w-full" placeholder={undefined}>
           <CardBody className="flex flex-col gap-4" placeholder={undefined}>
             <Typography variant="h4" color="blue-gray" placeholder={undefined}>
-              Novo Cliente
+              Novo Grupo
             </Typography>
             <Typography
               className="mb-3 font-normal"
               variant="paragraph"
               color="gray" placeholder={undefined}>
-              Insira as informações para cadastrar um novo cliente
+              Insira as informações para cadastrar um novo grupo
             </Typography>
             <div className="flex flex-row justify-between">
               <div className="w-6/12">
-                <Input variant="standard" label="Nome" size="lg" crossOrigin={undefined} value={clientName} onChange={handleClientNameChange} />
-              </div>
-              <div className="w-5/12">
-                <Input variant="standard" label="CNPJ" size="lg" crossOrigin={undefined} value={clientCNPJ} onChange={handleClientCNPJChange} />
-              </div>
-            </div>
-            <div className="flex flex-row justify-between">
-              <div className="w-6/12">
-                <Input variant="standard" type="email" label="Email" size="lg" crossOrigin={undefined} value={clientEmail} onChange={handleClientEmailChange} />
-              </div>
-              <div className="w-5/12">
-                <Input variant="standard" label="Telefone" size="lg" crossOrigin={undefined} value={clientPhone} onChange={handleClientPhoneChange} />
+                <Input variant="standard" label="Nome" size="lg" crossOrigin={undefined} value={groupName} onChange={handleGroupNameChange} />
               </div>
             </div>
           </CardBody>
           <br />
+          <Card className="mx-auto w-full" placeholder={undefined}>
+            <CardBody className="flex flex-row gap-4" placeholder={undefined}>
+              {
+                permissions.map(p => {
+                  return (
+                    <Card className="mx-auto" placeholder={undefined}>
+                      <CardHeader className="text-center" placeholder={undefined}>
+                        <Typography
+                          className="mb-3 font-normal"
+                          variant="lead"
+                          color="gray" placeholder={undefined}>
+                          {p.name}
+                        </Typography>
+                      </CardHeader>
+                      <CardBody placeholder={undefined}>
+                        <Checkbox color="indigo" crossOrigin={undefined} label="Ler" name={`read#${p.id}`} onChange={handleCheckPermissionChange} />
+                        <Checkbox color="indigo" crossOrigin={undefined} label="Criar" name={`create#${p.id}`} onChange={handleCheckPermissionChange} />
+                        <Checkbox color="indigo" crossOrigin={undefined} label="Atualizar" name={`update#${p.id}`} onChange={handleCheckPermissionChange} />
+                        <Checkbox color="indigo" crossOrigin={undefined} label="Deletar" name={`delete#${p.id}`} onChange={handleCheckPermissionChange} />
+                      </CardBody>
+                    </Card>
+                  )
+                })
+              }
+            </CardBody>
+          </Card>
+          <br />
           <CardFooter className="pt-0 flex justify-end" placeholder={undefined}>
-            <Button variant="gradient" color="blue-gray" onClick={handleSendClientForm} placeholder={undefined} loading={sendingFormLoading}>
+            <Button variant="gradient" color="blue-gray" onClick={handleSendGroupForm} placeholder={undefined} loading={sendingFormLoading}>
               Confirmar
             </Button>
-            <Button variant="gradient" color="red" onClick={handleOpenClientDialog} placeholder={undefined}>
+            <Button variant="gradient" color="red" onClick={handleOpenGroupDialog} placeholder={undefined}>
               Cancelar
             </Button>
           </CardFooter>

@@ -12,7 +12,7 @@ export function Logout() {
     const logoutParams = new URLSearchParams({
       client_id: import.meta.env.VITE_KC_CLIENT_ID,
       id_token_hint: Cookies.get("id_token") as string,
-      post_logout_redirect_uri: `${import.meta.env.BASE_URL}/login`,
+      post_logout_redirect_uri: `${import.meta.env.VITE_BASE_URL}/callback`,
     });
 
     clearCookies();

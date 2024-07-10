@@ -15,7 +15,9 @@ import { PoliciesGuard } from '../policy/policy.guard';
 import { Action } from '../casl/casl-ability.factory/casl-ability.factory';
 import { CheckPolicies } from '../policy/policy.decorator';
 import { Prisma } from '@prisma/client';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('client')
 @Controller('clients')
 @UseGuards(PoliciesGuard)
 export class ClientsController {

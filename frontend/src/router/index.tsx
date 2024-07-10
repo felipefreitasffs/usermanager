@@ -6,6 +6,8 @@ import { PrivateRoute } from "./PrivateRoute";
 import { Callback } from "../pages/Callback";
 import { Users } from "../pages/Users";
 import { Clients } from "../pages/Clients";
+import { Units } from "../pages/Units";
+import { Groups } from "../pages/Groups";
 
 const router = createBrowserRouter([
   {
@@ -32,8 +34,16 @@ const router = createBrowserRouter([
         element: <Users />
       },
       {
+        path: "/groups",
+        element: <Groups />
+      },
+      {
         path: "/clients",
         element: <Clients />
+      },
+      {
+        path: "/units",
+        element: <Units />
       }
     ]
   }
